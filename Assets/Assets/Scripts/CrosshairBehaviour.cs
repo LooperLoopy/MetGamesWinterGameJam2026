@@ -70,21 +70,21 @@ public class CrosshairBehaviour : MonoBehaviour
         if (t >= 1)
         {
             active = false;
-            TargetManager.onMiss.Invoke();
+            ScoreManager.onMiss.Invoke(10);
             completionSource.TrySetResult(true);
         }
     }
 
-    public void onHit()
+    public void onHit(int combo)
     {
         active = false;
-        if (rectTransform.anchoredPosition.magnitude <= 30)
+        if (rectTransform.anchoredPosition.magnitude <= 33)
         {
-            TargetManager.onHit.Invoke();
+            ScoreManager.onHit.Invoke(combo);
         }
         else
         {
-            TargetManager.onMiss.Invoke();
+            ScoreManager.onMiss.Invoke(10);
            
         }
         completionSource.TrySetResult(true);

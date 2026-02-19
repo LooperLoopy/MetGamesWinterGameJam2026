@@ -10,6 +10,7 @@ public class MenuManager : MonoBehaviour
     // Menu Objects
     [Header("Menus")]
     [SerializeField] GameObject option_menu;
+    [SerializeField] GameObject start_menu;
     [SerializeField] GameObject engage_menu;
 
     // Vars
@@ -25,7 +26,7 @@ public class MenuManager : MonoBehaviour
     void Start()
     {
         gameManager = GameManager.Instance;
-        openOptions();
+        openStart();
     }
 
     public void openOptions()
@@ -36,6 +37,18 @@ public class MenuManager : MonoBehaviour
     public void openEngage()
     {
         Open(engage_menu);
+    }
+
+    public void openStart()
+    {
+        Open(start_menu);
+        Close(option_menu);
+        Close(engage_menu);
+    }
+
+    public void closeEngage()
+    {
+        Close(engage_menu);
     }
 
     public void switchMenuSides()

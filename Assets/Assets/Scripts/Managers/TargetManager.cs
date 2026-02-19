@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 public class TargetManager : MonoBehaviour
 {
@@ -11,18 +10,23 @@ public class TargetManager : MonoBehaviour
 
     [Header("UI Elements")]
     [SerializeField] private Transform hitZone;
+    [SerializeField] private GameObject comboGUI;
     [SerializeField] private CrosshairBehaviour crosshair;
     [SerializeField] private Canvas canvas;
 
-    public static UnityEvent onMiss = new UnityEvent();
-    public static UnityEvent onHit = new UnityEvent();
+    private UnityEvent<int> onMiss;
+    private UnityEvent<int> onHit;
 
     private CrosshairBehaviour curr;
     private bool hasHit = false;
+    private int combo = 0;
 
     void Awake()
     {
         Instance = this;
+
+        onHit = ScoreManager.onHit;
+        onMiss = ScoreManager.onMiss;
     }
 
     void OnEnable()
@@ -40,11 +44,14 @@ public class TargetManager : MonoBehaviour
     void Start()
     {
         hitZone.gameObject.SetActive(false);
+        comboGUI.SetActive(false);
     }
 
     public async Task spawnHits(List<EnemyBehaviour> enemies)
     {
+        comboGUI.GetComponent<TextMeshProUGUI>().text = combo + 1 + "x";
         hitZone.gameObject.SetActive(true);
+        comboGUI.SetActive(true);
 
         foreach (EnemyBehaviour enemy in enemies)
         {
@@ -68,28 +75,40 @@ public class TargetManager : MonoBehaviour
             }
 
             Destroy(instance.gameObject);
+
+            if (!GameManager.Instance.isGaming())
+            {
+                break;
+            }
         }
 
+        curr = null;
+        combo = 0;
         hitZone.gameObject.SetActive(false);
+        comboGUI.SetActive(false);
     }
 
     public void onClick()
     {
         if (curr != null)
         {
-            curr.onHit();
+            curr.onHit(combo);
         }
     }
 
-    private void missed()
+    private void missed(int sus)
     {
         Debug.Log("Missed");
         hasHit = false;
+        combo = 0;
+        comboGUI.GetComponent<TextMeshProUGUI>().text = combo + 1 + "x";
     }
 
-    private void hit()
+    private void hit(int c)
     {
         Debug.Log("Hit");
         hasHit = true;
+        combo += 1;
+        comboGUI.GetComponent<TextMeshProUGUI>().text = combo + 1 + "x";
     }
 }

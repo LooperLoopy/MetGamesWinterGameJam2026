@@ -3,8 +3,8 @@ using UnityEngine;
 public class BaseMenu : MonoBehaviour
 {
     [Header("Canvas Items")]
-    [SerializeField] private Canvas canvas;
-    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] protected Canvas canvas;
+    [SerializeField] protected CanvasGroup canvasGroup;
 
     protected RectTransform rectTranform;
 
@@ -31,6 +31,11 @@ public class BaseMenu : MonoBehaviour
 
     public virtual void Open()
     {
+        if (!GameManager.Instance.isGaming())
+        {
+            return;
+        }
+
         opened = true;
         canvasGroup.alpha = 1f;
         canvasGroup.interactable = true;

@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -58,6 +59,11 @@ public class OptionsMenu : BaseMenu
         MoveButton.onClick.AddListener(onMove);
     }
 
+    protected override void handleOpen()
+    {
+        EventSystem.current.SetSelectedGameObject(EngageButton.gameObject);
+    }
+
     private void onEngage()
     {
         this.Close();
@@ -67,16 +73,22 @@ public class OptionsMenu : BaseMenu
 
     async private void onPeek()
     {
+        ScoreManager.onMiss.Invoke(10);
+
         this.Close();
         Vector3 v = new Vector3(0, 1, 0);
         Vector3 reset = new Vector3(0, 0, 0);
 
         GameManager.moveCamera.Invoke(v);
+        
+        await Task.Delay(200);
+        EnemyManager.Instance.showHitPoints();
 
         await Task.Delay(200);
 
         this.Open();
         GameManager.moveCamera.Invoke(reset);
+        EnemyManager.Instance.hideHitPoints();
     }
 
     private void onMove()

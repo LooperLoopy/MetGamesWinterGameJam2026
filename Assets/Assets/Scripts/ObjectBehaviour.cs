@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class ObjectBehaviour : MonoBehaviour
 {
-    public void Initialize(int value)
+    public void Initialize()
     {
-        Debug.Log("Initialized with " + value);
+        Debug.Log("Initialized");
     }
     
 }

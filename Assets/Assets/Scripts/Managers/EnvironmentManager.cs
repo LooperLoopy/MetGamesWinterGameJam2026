@@ -14,6 +14,9 @@ public class EnvironmentManager : MonoBehaviour
 
     [Header("Objects")]
     [SerializeField] private ObjectBehaviour Obj1;
+    [SerializeField] private ObjectBehaviour Obj2;
+
+    private ObjectBehaviour[] randomObject;
 
     private List<Transform> ObjectSpawnPoints;
     private List<Transform> EnemySpawnPoints;
@@ -35,6 +38,12 @@ public class EnvironmentManager : MonoBehaviour
         {
             ObjectSpawnPoints.Add(child);
         }
+
+        randomObject = new ObjectBehaviour[] 
+        {
+            Obj1,
+            Obj2
+        };
     }
 
     void Start()
@@ -49,7 +58,9 @@ public class EnvironmentManager : MonoBehaviour
 
         foreach (Transform t in ObjectSpawnPoints)
         {
-            ObjectBehaviour instance = Instantiate(Obj1, t.position, Quaternion.identity);
+            ObjectBehaviour randomObj = randomObject[UnityEngine.Random.Range(0, randomObject.Length)];
+
+            ObjectBehaviour instance = Instantiate(randomObj, t.position, Quaternion.identity);
             instance.transform.SetParent(prefabs);
 
             foreach (Transform spawnPoint in instance.transform.Find("SpawnPoints").transform)
@@ -57,7 +68,7 @@ public class EnvironmentManager : MonoBehaviour
                 EnemySpawnPoints.Add(spawnPoint);
             }
 
-            instance.Initialize(5);
+            instance.Initialize();
         }
 
         enemyManager.spawnEnemies();
@@ -70,6 +81,7 @@ public class EnvironmentManager : MonoBehaviour
             Destroy(child.gameObject);
         }
         EnemySpawnPoints.Clear();
+        enemyManager.Clear();
     }
 
     public List<Transform> getEnemyPoints()

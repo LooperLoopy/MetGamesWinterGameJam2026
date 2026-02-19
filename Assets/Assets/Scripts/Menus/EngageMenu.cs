@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -20,6 +21,11 @@ public class EngageMenu : BaseMenu
         ComfirmButton.onClick.AddListener(onConfirm);
     }
 
+    protected override void handleOpen()
+    {
+        EventSystem.current.SetSelectedGameObject(ComfirmButton.gameObject);
+    }
+
     private void onConfirm()
     {
         Close();
@@ -27,10 +33,4 @@ public class EngageMenu : BaseMenu
     }
 
     public override void swapSides(){}
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

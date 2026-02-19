@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class EnemyBehaviour : MonoBehaviour
@@ -16,14 +18,20 @@ public class EnemyBehaviour : MonoBehaviour
 
     // Vars
     private bool selected = false;
+    private Key requiredKey;
     private float difficulty;
 
-    public void Initialize(Transform weakpoint)
+    private GameManager gameManager;
+
+    public void Initialize(Transform weakpoint, Key requiredKey)
     {
         enemyManager = EnemyManager.Instance;
+        gameManager = GameManager.Instance;
 
-        canvas = GameManager.Instance.UISpace.transform.Find("Canvas").GetComponent<Canvas>();
-        mainCamera = GameManager.Instance.playerCamera.GetComponent<Camera>();
+        this.requiredKey = requiredKey;
+
+        canvas = gameManager.UISpace.transform.Find("Canvas").GetComponent<Canvas>();
+        mainCamera = gameManager.playerCamera.GetComponent<Camera>();
 
         position = weakpoint.position - new Vector3(0, 1, 0);
         screenPos = mainCamera.WorldToScreenPoint(position);
@@ -33,12 +41,11 @@ public class EnemyBehaviour : MonoBehaviour
 
         hideButton();
 
-        // Set position
+        // Set button
         button.GetComponent<RectTransform>().position = screenPos;
+        button.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = requiredKey.ToString();
 
-        button.GetComponent<Button>().onClick.AddListener(onSelect);
-
-        difficulty = 3;
+        difficulty = Random.Range(1, 4);
     }
 
     public float getDifficulty()
@@ -101,6 +108,14 @@ public class EnemyBehaviour : MonoBehaviour
             selectButton();
             selected = true;
             Debug.Log("selected");
+        }
+    }
+
+    void Update()
+    {
+        if (gameManager.isEngagedf() && Keyboard.current[requiredKey].wasPressedThisFrame)
+        {
+            onSelect();
         }
     }
 }
