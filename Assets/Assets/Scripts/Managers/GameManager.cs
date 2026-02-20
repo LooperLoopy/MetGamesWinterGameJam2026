@@ -45,7 +45,9 @@ public class GameManager : MonoBehaviour
     // Gameplay
     [Header("Gameplay")]
     [SerializeField] private float time = 30f;
-    private float engageTime = 0.85f;
+    private float maxEngageTime = 1.2f;
+    private float minEngageTime = 0.85f; 
+    private float engageTime = 1.2f;
     private int roomNumber = 1;
     private bool isEngaged = false;
     private bool canAttack = false;
@@ -82,6 +84,7 @@ public class GameManager : MonoBehaviour
 
     public void startGame()
     {
+        engageTime = maxEngageTime;
         roomNumber = 1;
         isPlaying = true;
         menuManager.openOptions();
@@ -134,6 +137,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         roomNumber += 1;
+        engageTime = Math.Max(minEngageTime, engageTime - 0.1f);
         environmentManager.clearObjects();
         environmentManager.spawnObjects(roomNumber);
     }
