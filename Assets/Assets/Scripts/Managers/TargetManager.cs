@@ -59,7 +59,7 @@ public class TargetManager : MonoBehaviour
             float difficulty = enemy.getDifficulty();
 
             float freq = difficulty * Random.Range(1, 2);
-            float strength = difficulty * 10 * Random.Range(0.5f, 2f);
+            float strength = difficulty * 5 * Random.Range(0.5f, 2f);
             float time = 3.5f / difficulty * Random.Range(0.9f, 1.1f);
 
             CrosshairBehaviour instance = Instantiate(crosshair, canvas.transform);

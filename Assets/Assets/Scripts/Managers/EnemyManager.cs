@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -54,7 +55,7 @@ public class EnemyManager : MonoBehaviour
         environmentManager = EnvironmentManager.Instance;
     }
 
-    public void spawnEnemies()
+    public void spawnEnemies(int roomNumber)
     {
         List<Key> alphaKeysCopy = new List<Key>(alphaKeys);
 
@@ -76,15 +77,19 @@ public class EnemyManager : MonoBehaviour
 
             instances.Add(instance);
 
-            Key randomKey = alphaKeysCopy[Random.Range(0, alphaKeysCopy.Count)];
+            Key randomKey = alphaKeysCopy[UnityEngine.Random.Range(0, alphaKeysCopy.Count)];
             alphaKeysCopy.Remove(randomKey);
 
-            instance.Initialize(weakPoint, randomKey);
+            int difficulty = (int)Math.Ceiling(UnityEngine.Random.Range(roomNumber / 3, roomNumber / 3 + 1f));
+
+            difficulty = Math.Min(difficulty, 4);
+
+            instance.Initialize(weakPoint, randomKey, difficulty);
         }
 
         if (instances.Count == 0)
         {
-            spawnEnemies();
+            spawnEnemies(roomNumber);
         }
     }
 

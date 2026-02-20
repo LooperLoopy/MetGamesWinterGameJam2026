@@ -6,6 +6,9 @@ using UnityEngine.UI;
 public class EnemyBehaviour : MonoBehaviour
 {
     [SerializeField] private GameObject buttonPrefab; 
+    [SerializeField] private ParticleBehaviour particlePrefab; 
+    private GameObject Cross; 
+    private GameObject environment; 
     private Canvas canvas; 
     private Camera mainCamera;
     private Vector3 position;
@@ -23,7 +26,7 @@ public class EnemyBehaviour : MonoBehaviour
 
     private GameManager gameManager;
 
-    public void Initialize(Transform weakpoint, Key requiredKey)
+    public void Initialize(Transform weakpoint, Key requiredKey, int difficulty)
     {
         enemyManager = EnemyManager.Instance;
         gameManager = GameManager.Instance;
@@ -31,6 +34,7 @@ public class EnemyBehaviour : MonoBehaviour
         this.requiredKey = requiredKey;
 
         canvas = gameManager.UISpace.transform.Find("Canvas").GetComponent<Canvas>();
+        environment = gameManager.environment;
         mainCamera = gameManager.playerCamera.GetComponent<Camera>();
 
         position = weakpoint.position - new Vector3(0, 1, 0);
@@ -38,6 +42,7 @@ public class EnemyBehaviour : MonoBehaviour
 
         button = Instantiate(buttonPrefab, canvas.transform);
         canvasGroup = button.GetComponent<CanvasGroup>();
+        Cross = button.transform.Find("Cross").gameObject;
 
         hideButton();
 
@@ -45,7 +50,7 @@ public class EnemyBehaviour : MonoBehaviour
         button.GetComponent<RectTransform>().position = screenPos;
         button.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = requiredKey.ToString();
 
-        difficulty = Random.Range(1, 4);
+        this.difficulty = difficulty;
     }
 
     public float getDifficulty()
@@ -55,7 +60,8 @@ public class EnemyBehaviour : MonoBehaviour
 
     public void showButton()
     {
-        canvasGroup.alpha = 0.6f;
+        canvasGroup.alpha = 0.8f;
+        Cross.SetActive(false);
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
     }
@@ -63,6 +69,7 @@ public class EnemyBehaviour : MonoBehaviour
     public void hideButton()
     {
         canvasGroup.alpha = 0f;
+        Cross.SetActive(false);
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
     }
@@ -70,6 +77,7 @@ public class EnemyBehaviour : MonoBehaviour
     private void selectButton()
     {
         canvasGroup.alpha = 1f;
+        Cross.SetActive(true);
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
     }
@@ -79,6 +87,8 @@ public class EnemyBehaviour : MonoBehaviour
         selected = false;
 
         // play a die animation
+        ParticleBehaviour coins = Instantiate(particlePrefab, environment.transform);
+        coins.transform.position = this.gameObject.transform.position;
 
         enemyManager.hitEnemy(this);
     }

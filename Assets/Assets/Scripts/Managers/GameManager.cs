@@ -11,8 +11,11 @@ public class GameManager : MonoBehaviour
 
     [Header("Scene Objects")]
     [SerializeField] public GameObject player;
+    [SerializeField] public GameObject timer;
+    [SerializeField] public Transform timerT;
     [SerializeField] public GameObject playerCamera;
     [SerializeField] public GameObject UISpace;
+    [SerializeField] public GameObject environment;
     
     private Vector3 camStart;
 
@@ -42,7 +45,8 @@ public class GameManager : MonoBehaviour
     // Gameplay
     [Header("Gameplay")]
     [SerializeField] private float time = 30f;
-    [SerializeField] private int engageTime = 700;
+    private float engageTime = 0.85f;
+    private int roomNumber = 1;
     private bool isEngaged = false;
     private bool canAttack = false;
     private bool isPlaying = false;
@@ -65,6 +69,8 @@ public class GameManager : MonoBehaviour
         playerController = player.GetComponent<PlayerController>();
         camStart = playerCamera.transform.position;
 
+        timerT = timer.GetComponent<RectTransform>();
+
         enemiesQ = new List<EnemyBehaviour>();
 
         menuManager = MenuManager.Instance;
@@ -76,10 +82,14 @@ public class GameManager : MonoBehaviour
 
     public void startGame()
     {
+        roomNumber = 1;
         isPlaying = true;
         menuManager.openOptions();
-        environmentManager.spawnObjects();
+        environmentManager.spawnObjects(roomNumber);
         scoreManager.Reset();
+
+        timer.SetActive(false);
+        timerT.localScale = new Vector3(1,1,1);
     }
 
     public void gameEnd()
@@ -87,6 +97,9 @@ public class GameManager : MonoBehaviour
         isPlaying = false;
         menuManager.openStart();
         environmentManager.clearObjects();
+
+        timer.SetActive(false);
+        timerT.localScale = new Vector3(1,1,1);
     }
 
     void OnEnable()
@@ -120,8 +133,9 @@ public class GameManager : MonoBehaviour
         {
             return;
         }
+        roomNumber += 1;
         environmentManager.clearObjects();
-        environmentManager.spawnObjects();
+        environmentManager.spawnObjects(roomNumber);
     }
 
     private void addToQ(EnemyBehaviour e)
@@ -169,6 +183,35 @@ public class GameManager : MonoBehaviour
         await moveCamTask(v);
     }
 
+    private async Task setTimer()
+    {
+        timer.SetActive(true);
+
+        Vector3 start = new Vector3(1,1,1);
+        Vector3 end = new Vector3(0,1,1);
+
+        float duration = engageTime;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+
+            float t = elapsed / duration;
+            t = Mathf.Clamp01(t);
+
+            timerT.localScale = Vector3.Lerp(start, end, t);
+
+            await Task.Yield();
+        }
+
+        timerT.localScale = end;
+
+        timer.SetActive(false);
+
+        timerT.localScale = start;
+    }
+
     private async void toggleEngage()
     {
         if (engaging){
@@ -182,15 +225,15 @@ public class GameManager : MonoBehaviour
 
         if (!isEngaged)
         {
+            await moveCamTask(v);
+            menuManager.openEngage();
             isEngaged = true;
 
-            menuManager.openEngage();
-            await moveCamTask(v);
             enemyManager.showHitPoints();
 
             engaging = false;
 
-            await Task.Delay(engageTime);
+            await setTimer();
 
             if (isEngaged)
             {
@@ -201,6 +244,8 @@ public class GameManager : MonoBehaviour
         else
         {
             isEngaged = false;
+
+            timer.SetActive(false);
 
             enemyManager.hideHitPoints();
 

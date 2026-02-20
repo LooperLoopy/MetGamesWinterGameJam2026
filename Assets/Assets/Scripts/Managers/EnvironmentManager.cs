@@ -51,7 +51,7 @@ public class EnvironmentManager : MonoBehaviour
         enemyManager = EnemyManager.Instance;
     }
 
-    public void spawnObjects()
+    public void spawnObjects(int roomNumber)
     {
         if (enemyManager == null)
             enemyManager = EnemyManager.Instance;
@@ -71,7 +71,7 @@ public class EnvironmentManager : MonoBehaviour
             instance.Initialize();
         }
 
-        enemyManager.spawnEnemies();
+        enemyManager.spawnEnemies(roomNumber);
     }
 
     public void clearObjects()

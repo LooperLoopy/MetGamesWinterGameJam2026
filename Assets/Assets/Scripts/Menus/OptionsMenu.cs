@@ -15,6 +15,8 @@ public class OptionsMenu : BaseMenu
     [SerializeField] private Button MoveButton;
     [SerializeField] private Button button;
 
+    private GameObject lastButton;
+
     // Position
     private Vector2 mousePosition;
     private Vector2 opPosition;
@@ -57,23 +59,27 @@ public class OptionsMenu : BaseMenu
         EngageButton.onClick.AddListener(onEngage);
         PeekButton.onClick.AddListener(onPeek);
         MoveButton.onClick.AddListener(onMove);
+
+        lastButton = EngageButton.gameObject;
     }
 
     protected override void handleOpen()
     {
-        EventSystem.current.SetSelectedGameObject(EngageButton.gameObject);
+        EventSystem.current.SetSelectedGameObject(lastButton);
     }
 
     private void onEngage()
     {
         this.Close();
+        lastButton = EngageButton.gameObject;
         
         GameManager.engageToggle.Invoke();
     }
 
     async private void onPeek()
     {
-        ScoreManager.onMiss.Invoke(10);
+        lastButton = PeekButton.gameObject;
+        ScoreManager.onMiss.Invoke(5);
 
         this.Close();
         Vector3 v = new Vector3(0, 1, 0);
@@ -84,7 +90,7 @@ public class OptionsMenu : BaseMenu
         await Task.Delay(200);
         EnemyManager.Instance.showHitPoints();
 
-        await Task.Delay(200);
+        await Task.Delay(500);
 
         this.Open();
         GameManager.moveCamera.Invoke(reset);
